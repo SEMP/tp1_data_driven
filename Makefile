@@ -10,13 +10,13 @@ ifeq ($(OS),Windows_NT)
 	PIP = $(VENV)/Scripts/pip.exe
 	RM = rmdir /s /q
 	VENV_CMD = python -m venv $(VENV)
-	INSTALL_REQS = if exist requirements.txt $(PIP) install -r requirements.txt
+	NULL = nul
 else
 	PYTHON = $(VENV)/bin/python
 	PIP = $(VENV)/bin/pip
 	RM = rm -rf
 	VENV_CMD = python3 -m venv $(VENV)
-	INSTALL_REQS = test -f requirements.txt && $(PIP) install -r requirements.txt || true
+	NULL = /dev/null
 endif
 
 run:
@@ -25,7 +25,7 @@ run:
 install:
 	$(VENV_CMD)
 	$(PIP) install --upgrade pip
-	$(INSTALL_REQS)
+	-$(PIP) install -r requirements.txt 2>$(NULL)
 
 freeze:
 	$(PIP) freeze > requirements.txt
