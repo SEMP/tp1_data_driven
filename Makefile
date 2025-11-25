@@ -8,15 +8,11 @@ VENV = .venv
 ifeq ($(OS),Windows_NT)
 	PYTHON = $(VENV)/Scripts/python.exe
 	PIP = $(VENV)/Scripts/pip.exe
-	RM = rmdir /s /q
 	VENV_CMD = python -m venv $(VENV)
-	NULL = nul
 else
 	PYTHON = $(VENV)/bin/python
 	PIP = $(VENV)/bin/pip
-	RM = rm -rf
 	VENV_CMD = python3 -m venv $(VENV)
-	NULL = /dev/null
 endif
 
 run:
@@ -31,4 +27,4 @@ freeze:
 	$(PIP) freeze > requirements.txt
 
 clean:
-	-$(RM) $(VENV)
+	rm -rf $(VENV)
