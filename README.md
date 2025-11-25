@@ -1,6 +1,27 @@
 # Datatran Analysis Project
 
-Data analysis project for transportation accident data (datatran) spanning 2007-2025. Part of the course "Análisis de Datos con Métodos de Data Driven" - Maestría en Inteligencia Artificial.
+Transportation accident data analysis using data-driven methods (2007-2025).
+
+**Course:** MIA10 - Análisis de Datos con Métodos de Data Driven
+**Institution:** Maestría en Inteligencia Artificial y Ciencias de Datos - Facultad Politécnica (FP-UNA)
+**Professor:** Dr. Carlos Méndez
+
+## Assignment Context
+
+This repository corresponds to **Trabajo Práctico 1** (40% of final grade, due Week 3):
+
+**Requirements:**
+- Apply **at least two data-driven methods** (POD, DMD, HODMD, SVD, etc.) to discover patterns, extract dominant modes, or perform predictions
+- Analyze real-world data to reveal hidden structures and patterns
+
+**Deliverables:**
+1. Technical Report: introduction, methodology, results, discussion, and conclusions
+2. Oral presentation (15 minutes) with visualizations and group discussion
+
+**Methodological Purpose:**
+- Understand how decomposition methods reveal hidden structures in real data
+- Evaluate predictive power and interpretability without knowing the underlying physics
+- Develop interdisciplinary analysis capability
 
 ## Project Overview
 
