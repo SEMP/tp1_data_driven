@@ -5,15 +5,15 @@ from glob import glob
 
 def create_sqlite_db():
     # Configuration
-    data_path = 'data'
-    db_filename = 'datatran_raw.db'
-    table_name = 'accidents'
+    DATA_PATH = 'data'
+    DB_FILENAME = 'datatran_raw.db'
+    TABLE_NAME = 'accidents'
 
-    # Path to CSV files
-    csv_files = glob(os.path.join(data_path, '*.csv'))
+    # Path to CSV files (sorted by year)
+    csv_files = sorted(glob(os.path.join(DATA_PATH, 'datatran*.csv')))
 
     # SQLite DB name (save inside data folder)
-    db_name = os.path.join(data_path, db_filename)
+    db_name = os.path.join(DATA_PATH, DB_FILENAME)
 
     # Connect to SQLite database (or create it)
     db_connection = sqlite3.connect(db_name)
@@ -29,7 +29,7 @@ def create_sqlite_db():
 
     # Create table with a new field as primary key (since the dataset has repeated ids between files)
     create_table_sql = f"""
-    CREATE TABLE IF NOT EXISTS {table_name}
+    CREATE TABLE IF NOT EXISTS {TABLE_NAME}
     (
         row_id INTEGER PRIMARY KEY AUTOINCREMENT,
         {columns[0]} INTEGER,
@@ -85,7 +85,7 @@ def create_sqlite_db():
         csv_dataframe = csv_dataframe.reindex(columns=expected_columns)
 
         # Insert into SQLite
-        csv_dataframe.to_sql(table_name, db_connection, if_exists='append', index=False)
+        csv_dataframe.to_sql(TABLE_NAME, db_connection, if_exists='append', index=False)
 
     print("All files imported successfully into SQLite.")
     db_connection.close()
