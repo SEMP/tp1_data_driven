@@ -22,7 +22,7 @@ run:
 
 install:
 	$(VENV_CMD)
-	$(PIP) install --upgrade pip
+	$(PYTHON) -m pip install --upgrade pip
 	-$(PIP) install -r requirements.txt
 
 freeze:
