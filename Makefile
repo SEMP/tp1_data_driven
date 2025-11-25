@@ -9,10 +9,12 @@ ifeq ($(OS),Windows_NT)
 	PYTHON = $(VENV)/Scripts/python.exe
 	PIP = $(VENV)/Scripts/pip.exe
 	VENV_CMD = python -m venv $(VENV)
+	RM_CMD = powershell -Command "if (Test-Path $(VENV)) { Remove-Item -Recurse -Force $(VENV) }"
 else
 	PYTHON = $(VENV)/bin/python
 	PIP = $(VENV)/bin/pip
 	VENV_CMD = python3 -m venv $(VENV)
+	RM_CMD = rm -rf $(VENV)
 endif
 
 run:
@@ -27,4 +29,4 @@ freeze:
 	$(PIP) freeze > requirements.txt
 
 clean:
-	rm -rf $(VENV)
+	$(RM_CMD)
