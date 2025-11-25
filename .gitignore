@@ -148,3 +148,6 @@ Thumbs.db
 
 # Claude Code
 CLAUDE.md
+
+# Data directory
+data/
