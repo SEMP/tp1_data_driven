@@ -4,22 +4,25 @@ import pandas as pd
 from glob import glob
 
 def create_sqlite_db():
-    # Path to CSV files
+    # Configuration
     data_path = 'data'
+    db_filename = 'datatran_raw.db'
+    table_name = 'accidents'
+
+    # Path to CSV files
     csv_files = glob(os.path.join(data_path, '*.csv'))
 
     # SQLite DB name (save inside data folder)
-    db_name = os.path.join(data_path, 'datatran.db')
-    table_name = 'accidents'
+    db_name = os.path.join(data_path, db_filename)
 
     # Connect to SQLite database (or create it)
     db_connection = sqlite3.connect(db_name)
 
-    # Column names based on 2025 CSV head
+    # Column names - unified schema from all years (2007-2025)
     columns = [
         "id", "data_inversa", "dia_semana", "horario", "uf", "br", "km", "municipio",
         "causa_acidente", "tipo_acidente", "classificacao_acidente", "fase_dia", "sentido_via",
-        "condicao_metereologica", "tipo_pista", "tracado_via", "uso_solo", "pessoas", "mortos",
+        "condicao_metereologica", "tipo_pista", "tracado_via", "uso_solo", "ano", "pessoas", "mortos",
         "feridos_leves", "feridos_graves", "ilesos", "ignorados", "feridos", "veiculos",
         "latitude", "longitude", "regional", "delegacia", "uop"
     ]
@@ -54,11 +57,12 @@ def create_sqlite_db():
         {columns[22]} INTEGER,
         {columns[23]} INTEGER,
         {columns[24]} INTEGER,
-        {columns[25]} TEXT,
+        {columns[25]} INTEGER,
         {columns[26]} TEXT,
         {columns[27]} TEXT,
         {columns[28]} TEXT,
-        {columns[29]} TEXT
+        {columns[29]} TEXT,
+        {columns[30]} TEXT
     );
     """
 
