@@ -25,10 +25,10 @@ run:
 install:
 	$(VENV_CMD)
 	$(PIP) install --upgrade pip
-	-$(PIP) install -r requirements.txt 2>$(NULL)
+	-$(PIP) install -r requirements.txt
 
 freeze:
 	$(PIP) freeze > requirements.txt
 
 clean:
-	$(RM) $(VENV)
+	-$(RM) $(VENV)
