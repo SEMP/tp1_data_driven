@@ -46,4 +46,8 @@ def descargar_y_descomprimir_datos(csv_enlaces, carpeta='data'):
             descomprimir_y_limpiar(ruta_zip_temp, carpeta)
 
 if __name__ == "__main__":
-    descargar_y_descomprimir_datos('enlaces.csv')
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    enlaces_path = os.path.join(script_dir, 'enlaces.csv')
+
+    descargar_y_descomprimir_datos(enlaces_path)

@@ -1,8 +1,9 @@
-.PHONY: run run-file download install freeze clean
+.PHONY: run run-file download create-sqlite install freeze clean
 
 # Configuration
 MAIN_FILE = main.py
-DOWNLOAD_SCRIPT = descarga.py
+DOWNLOAD_SCRIPT = etl/descarga.py
+CREATE_DB_SCRIPT = etl/create_sqlite_db.py
 VENV = .venv
 
 # Detect OS
@@ -31,6 +32,9 @@ run-file:
 
 download:
 	$(PYTHON) $(DOWNLOAD_SCRIPT)
+
+create-sqlite:
+	$(PYTHON) $(CREATE_DB_SCRIPT)
 
 install:
 	$(VENV_CMD)
