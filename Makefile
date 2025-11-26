@@ -1,9 +1,10 @@
-.PHONY: run run-file download create-sqlite install freeze clean
+.PHONY: run run-file download create-sqlite extract-data install freeze clean
 
 # Configuration
 MAIN_FILE = main.py
 DOWNLOAD_SCRIPT = etl/descarga.py
 CREATE_DB_SCRIPT = etl/create_sqlite_db.py
+EXTRACT_DATA_SCRIPT = etl/extract_data.py
 VENV = .venv
 
 # Detect OS
@@ -35,6 +36,9 @@ download:
 
 create-sqlite:
 	$(PYTHON) $(CREATE_DB_SCRIPT)
+
+extract-data:
+	$(PYTHON) $(EXTRACT_DATA_SCRIPT)
 
 install:
 	$(VENV_CMD)

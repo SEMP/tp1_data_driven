@@ -56,6 +56,7 @@ This will:
 make install        # Create virtual environment and install dependencies
 make download       # Download CSV files from Google Drive
 make create-sqlite  # Create SQLite database from downloaded CSVs
+make extract-data   # Extract and prepare data for analysis
 make run            # Run the main script (main.py)
 make run-file FILE=<path>  # Run a specific Python file
 make freeze         # Update requirements.txt with current packages
@@ -70,11 +71,19 @@ make clean          # Remove virtual environment
    ```
    Downloads zip files from Google Drive and extracts CSVs to `data/` directory.
 
-2. **Create database:**
+2. **Create raw database:**
    ```bash
    make create-sqlite
    ```
    Creates `data/datatran_raw.db` SQLite database from all CSV files.
+
+3. **Extract data for analysis:**
+   ```bash
+   make extract-data
+   ```
+   Extracts and prepares data from raw database to `extracted/analysis_data.db`:
+   - Daily time series (table: `accidents_daily`)
+   - Additional tables can be added for spatial analysis, etc.
 
 ## Project Structure
 
@@ -82,9 +91,12 @@ make clean          # Remove virtual environment
 .
 ├── etl/
 │   ├── descarga.py           # Extract: Download data from Google Drive
-│   ├── create_sqlite_db.py   # Transform & Load: Create SQLite database
+│   ├── create_sqlite_db.py   # Transform & Load: Create raw SQLite database
+│   ├── extract_data.py       # Orchestrator: Extract data for analysis
+│   ├── extract_timeseries.py # Extract: Daily time series
 │   └── enlaces.csv           # Configuration: Google Drive file IDs
-├── data/                     # Downloaded CSVs and database (gitignored)
+├── data/                     # Downloaded CSVs and raw database (gitignored)
+├── extracted/                # Processed data for analysis (committed)
 ├── main.py                   # Main entry point
 ├── Makefile                  # Cross-platform build commands
 ├── requirements.txt          # Python dependencies
@@ -117,9 +129,10 @@ The unified database schema contains **31 columns** total, with missing fields f
 To customize the pipeline, edit variables at the top of the Makefile:
 
 ```makefile
-MAIN_FILE = main.py              # Main script entry point
+MAIN_FILE = main.py                # Main script entry point
 DOWNLOAD_SCRIPT = etl/descarga.py
 CREATE_DB_SCRIPT = etl/create_sqlite_db.py
+EXTRACT_DATA_SCRIPT = etl/extract_data.py
 ```
 
 Or edit configuration constants in the ETL scripts:
@@ -128,6 +141,7 @@ Or edit configuration constants in the ETL scripts:
 ## Notes
 
 - Downloaded data is stored in `data/` (excluded from git)
+- Extracted/processed data is stored in `extracted/` (committed to repository)
 - Database encoding automatically handles ISO-8859-1 to UTF-8 conversion
 - Files are processed in chronological order (2007 → 2025)
 - The database uses `row_id` as primary key (original `id` field has duplicates across years)
