@@ -8,15 +8,29 @@ def create_sqlite_db():
     DATA_PATH = 'data'
     DB_FILENAME = 'datatran_raw.db'
     TABLE_NAME = 'accidents'
+    DELETE_CSV_AFTER_IMPORT = True  # Delete CSV files after successful database creation
 
     # Path to CSV files (sorted by year)
     csv_files = sorted(glob(os.path.join(DATA_PATH, 'datatran*.csv')))
+
+    # Safety check: Ensure CSV files exist before proceeding
+    if not csv_files:
+        print("   Error: No CSV files found to import!")
+        print(f"   Please run 'make download' first to download the data.")
+        print(f"   Looking for files in: {DATA_PATH}/datatran*.csv")
+        return
+
+    print(f"Found {len(csv_files)} CSV files to import.")
 
     # SQLite DB name (save inside data folder)
     db_name = os.path.join(DATA_PATH, DB_FILENAME)
 
     # Connect to SQLite database (or create it)
     db_connection = sqlite3.connect(db_name)
+
+    # Drop existing table to avoid duplicates (safe because we verified CSV files exist)
+    db_connection.execute(f"DROP TABLE IF EXISTS {TABLE_NAME};")
+    db_connection.commit()
 
     # Column names - unified schema from all years (2007-2025)
     columns = [
@@ -29,7 +43,7 @@ def create_sqlite_db():
 
     # Create table with a new field as primary key (since the dataset has repeated ids between files)
     create_table_sql = f"""
-    CREATE TABLE IF NOT EXISTS {TABLE_NAME}
+    CREATE TABLE {TABLE_NAME}
     (
         row_id INTEGER PRIMARY KEY AUTOINCREMENT,
         {columns[0]} INTEGER,
@@ -89,6 +103,17 @@ def create_sqlite_db():
 
     print("All files imported successfully into SQLite.")
     db_connection.close()
+
+    # Cleanup: Delete CSV files after successful import
+    if DELETE_CSV_AFTER_IMPORT:
+        print("\nCleaning up CSV files...")
+        for csv_file in csv_files:
+            try:
+                os.remove(csv_file)
+                print(f"  ✓ Deleted: {os.path.basename(csv_file)}")
+            except Exception as e:
+                print(f"  ✗ Could not delete {os.path.basename(csv_file)}: {e}")
+        print("Cleanup complete. CSV files removed, database retained.")
 
 if __name__ == "__main__":
     create_sqlite_db()

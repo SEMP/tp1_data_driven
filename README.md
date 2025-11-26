@@ -141,6 +141,8 @@ Or edit configuration constants in the ETL scripts:
 ## Notes
 
 - Downloaded data is stored in `data/` (excluded from git)
+- **CSV files are automatically deleted** after successful database creation to save disk space
+  - To keep CSV files, set `DELETE_CSV_AFTER_IMPORT = False` in `etl/create_sqlite_db.py`
 - Extracted/processed data is stored in `extracted/` (committed to repository)
 - Database encoding automatically handles ISO-8859-1 to UTF-8 conversion
 - Files are processed in chronological order (2007 → 2025)
