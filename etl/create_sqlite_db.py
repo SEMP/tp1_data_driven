@@ -88,7 +88,14 @@ def create_sqlite_db():
 
     for file in csv_files:
         print(f"Importing {file}...")
-        csv_dataframe = pd.read_csv(file, sep=';', encoding='ISO-8859-1', low_memory=False)
+        csv_dataframe = pd.read_csv(
+            file,
+            sep=';',
+            encoding='ISO-8859-1',
+            low_memory=False,
+            na_values=['(null)', 'NULL', 'null', '', 'NA', 'N/A', 'n/a'],
+            keep_default_na=True
+        )
 
         # Add missing columns with None
         missing_cols = set(expected_columns) - set(csv_dataframe.columns)
