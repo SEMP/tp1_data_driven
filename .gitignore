@@ -153,5 +153,5 @@ CLAUDE.md
 # Data directory
 data/
 
-# Course materials
-docs/
+# Course materials (local only)
+docs_local/
