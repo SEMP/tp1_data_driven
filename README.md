@@ -82,8 +82,8 @@ make clean          # Remove virtual environment
    make extract-data
    ```
    Extracts and prepares data from raw database to `extracted/analysis_data.db`:
-   - Daily time series (table: `accidents_daily`)
-   - Additional tables can be added for spatial analysis, etc.
+   - **accidents_daily** - Daily time series of accident counts
+   - **accidents_spatial** - Spatial data with coordinates (2017-2025, includes: date, uf, municipio, lat, lon)
 
 ## Project Structure
 
@@ -94,9 +94,11 @@ make clean          # Remove virtual environment
 │   ├── create_sqlite_db.py   # Transform & Load: Create raw SQLite database
 │   ├── extract_data.py       # Orchestrator: Extract data for analysis
 │   ├── extract_timeseries.py # Extract: Daily time series
+│   ├── extract_spatial.py    # Extract: Spatial data with coordinates
 │   └── enlaces.csv           # Configuration: Google Drive file IDs
 ├── data/                     # Downloaded CSVs and raw database (gitignored)
 ├── extracted/                # Processed data for analysis (committed)
+│   └── analysis_data.db      # Contains: accidents_daily, accidents_spatial
 ├── main.py                   # Main entry point
 ├── Makefile                  # Cross-platform build commands
 ├── requirements.txt          # Python dependencies
