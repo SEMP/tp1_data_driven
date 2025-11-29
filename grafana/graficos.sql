@@ -12,6 +12,8 @@ SELECT
   unixepoch(accident_t.date) AS time,
   accident_t.uf,
   accident_t.municipio,
+  accident_t.br,
+  accident_t.km,
   accident_t.latitude,
   accident_t.longitude
 FROM accidents_spatial AS accident_t
@@ -23,6 +25,8 @@ SELECT
 	unixepoch(accident_t.date) AS time,
 	accident_t.uf,
 	accident_t.municipio,
+	accident_t.br,
+	accident_t.km,
 	accident_t.latitude,
 	accident_t.longitude
 FROM accidents_spatial AS accident_t
