@@ -1,4 +1,4 @@
-.PHONY: run run-file download create-sqlite extract-data svd install freeze clean
+.PHONY: run run-file download create-sqlite extract-data svd pod-spatial pod-estados dmd install freeze clean
 
 # Configuration
 MAIN_FILE = main.py
@@ -6,6 +6,9 @@ DOWNLOAD_SCRIPT = etl/descarga.py
 CREATE_DB_SCRIPT = etl/create_sqlite_db.py
 EXTRACT_DATA_SCRIPT = etl/extract_data.py
 SVD_SCRIPT = metodo_SVD/metodo_SVD.py
+POD_SPATIAL_SCRIPT = analysis/pod/pod_spatial.py
+POD_ESTADOS_SCRIPT = analysis/pod/pod_estados.py
+DMD_SCRIPT = analysis/dmd/dmd_analysis.py
 VENV = .venv
 
 # Detect OS
@@ -43,6 +46,15 @@ extract-data:
 
 svd:
 	$(PYTHON) $(SVD_SCRIPT)
+
+pod-spatial:
+	$(PYTHON) $(POD_SPATIAL_SCRIPT)
+
+pod-estados:
+	$(PYTHON) $(POD_ESTADOS_SCRIPT)
+
+dmd:
+	$(PYTHON) $(DMD_SCRIPT)
 
 install:
 	$(VENV_CMD)
