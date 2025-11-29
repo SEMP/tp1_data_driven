@@ -14,7 +14,7 @@ accidentes (ventanas de 30 días).
 
 ---
 
-<a name="figura-1-serie-temporal-diaria-de-accidentes"></a>
+<a id="figura-1-serie-temporal-diaria-de-accidentes"></a>
 ## Figura 1 – Serie temporal diaria de accidentes
 
 ![Serie temporal diaria de accidentes](../metodo_SVD/fig1_timeseries.png)
@@ -35,7 +35,7 @@ partir de esta señal aparentemente ruidosa.
 
 ---
 
-<a name="figura-2-espectro-de-valores-singulares"></a>
+<a id="figura-2-espectro-de-valores-singulares"></a>
 ## Figura 2 – Espectro de valores singulares (SVD/POD)
 
 ![Espectro de valores singulares](../metodo_SVD/fig2_svd_spectrum.png)
@@ -51,7 +51,7 @@ siguientes aportan correcciones mucho menores.
 
 ---
 
-<a name="figura-3-energia-acumulada-de-los-modos-pod"></a>
+<a id="figura-3-energia-acumulada-de-los-modos-pod"></a>
 ## Figura 3 – Energía acumulada de los modos POD
 
 ![Energía acumulada de los modos POD](../metodo_SVD/fig3_pod_energy.png)
@@ -68,7 +68,7 @@ describirse adecuadamente mediante un conjunto reducido de modos POD.
 
 ---
 
-<a name="figura-4-modo-pod-dominante"></a>
+<a id="figura-4-modo-pod-dominante"></a>
 ## Figura 4 – Modo POD dominante (patrón típico de 30 días)
 
 ![Modo POD dominante](../metodo_SVD/fig4_pod_mode1.png)
@@ -86,7 +86,7 @@ en el periodo**, más que una estructura intramensual compleja.
 
 ---
 
-<a name="figura-5-evolucion-temporal-del-modo-pod-dominante"></a>
+<a id="figura-5-evolucion-temporal-del-modo-pod-dominante"></a>
 ## Figura 5 – Evolución temporal del modo POD dominante
 
 ![Evolución temporal del modo POD dominante](../metodo_SVD/fig5_pod_coeff1.png)
