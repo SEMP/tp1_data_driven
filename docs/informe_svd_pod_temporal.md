@@ -87,10 +87,31 @@ El cálculo se observa en el bloque 1 del script.
 <a id="resultados-y-analisis-de-figuras"></a>
 ## Resultados y análisis de figuras
 
-<a id="figura-1-espectro-de-valores-singulares-svd"></a>
-### Figura 1 – Espectro de valores singulares (SVD)
+<a id="figura-1-serie-temporal-diaria-de-accidentes"></a>
+## Figura 1– Serie temporal diaria de accidentes
 
-![Espectro de valores singulares](../metodo_SVD/fig1_svd_spectrum.png)
+![Serie temporal diaria de accidentes](../metodo_SVD/fig1_timeseries.png)
+
+La Figura 1 muestra la serie temporal diaria de accidentes durante todo el
+periodo disponible en la base de datos. En el eje horizontal se representa la
+fecha y en el eje vertical el número de accidentes registrados cada día.
+
+Se observa una **primera etapa** con niveles relativamente altos y muy
+variables, donde los accidentes diarios presentan oscilaciones importantes y
+picos que superan los 800–1000 casos. Posteriormente, alrededor de los años
+2015–2016, se aprecia una **reducción brusca del nivel medio** de accidentes,
+tras la cual la serie entra en una **nueva etapa más estable**, con valores
+diarios generalmente más bajos y menos dispersos. Esta figura proporciona el
+contexto global sobre el que se aplican las técnicas de descomposición
+(SVD/POD/DMD), que buscan extraer patrones dominantes y estructuras ocultas a
+partir de esta señal aparentemente ruidosa.
+
+---
+
+<a id="figura-2-espectro-de-valores-singulares-svd"></a>
+### Figura 2 – Espectro de valores singulares (SVD)
+
+![Espectro de valores singulares](../metodo_SVD/fig2_svd_spectrum.png)
 
 El espectro en escala logarítmica es la primera evidencia de **reducibilidad**.
 Una caída rápida implica que pocos modos explican gran parte de la variabilidad
@@ -103,10 +124,10 @@ Figura generada en el bloque 2.
 
 ---
 
-<a id="figura-2-energia-acumulada-de-los-modos-svd"></a>
-### Figura 2 – Energía acumulada de los modos SVD
+<a id="figura-3-energia-acumulada-de-los-modos-svd"></a>
+### Figura 3 – Energía acumulada de los modos SVD
 
-![Energía acumulada](../metodo_SVD/fig2_cumulative_energy.png)
+![Energía acumulada](../metodo_SVD/fig3_cumulative_energy.png)
 
 Este gráfico muestra cuánta energía total está capturada por los primeros \(k\) modos.
 El script imprime una tabla de energías de los primeros modos y calcula automáticamente:
@@ -121,10 +142,10 @@ Esto está implementado en el bloque 3 y en el cálculo posterior de \(k_{95}\).
 
 ---
 
-<a id="figura-3-primeros-modos-espaciales-patrones-intra-ventana"></a>
-### Figura 3 – Primeros modos “espaciales” (patrones intra-ventana)
+<a id="figura-4-primeros-modos-espaciales-patrones-intra-ventana"></a>
+### Figura 4 – Primeros modos “espaciales” (patrones intra-ventana)
 
-![Modos espaciales](../metodo_SVD/fig3_spatial_modes.png)
+![Modos espaciales](../metodo_SVD/fig4_spatial_modes.png)
 
 En este análisis, los modos de \(U\) representan **patrones prototípicos dentro
 de las ventanas de 30 días**.  
@@ -141,10 +162,10 @@ Figura generada en el bloque 4.
 
 ---
 
-<a id="figura-4-primeros-coeficientes-temporales"></a>
-### Figura 4 – Primeros coeficientes temporales
+<a id="figura-5-primeros-coeficientes-temporales"></a>
+### Figura 5 – Primeros coeficientes temporales
 
-![Coeficientes temporales](../metodo_SVD/fig4_temporal_coeffs.png)
+![Coeficientes temporales](../metodo_SVD/fig5_temporal_coeffs.png)
 
 Las filas de \(V^T\) muestran cómo la contribución de cada patrón intra-ventana
 varía a lo largo de las miles de ventanas (snapshots).
@@ -163,10 +184,10 @@ Figura generada en el bloque 5.
 
 ---
 
-<a id="figura-5-error-global-de-reconstruccion-vs-numero-de-modos"></a>
-### Figura 5 – Error global de reconstrucción vs número de modos
+<a id="figura-6-error-global-de-reconstruccion-vs-numero-de-modos"></a>
+### Figura 6 – Error global de reconstrucción vs número de modos
 
-![Error global de reconstrucción](../metodo_SVD/fig5_reconstruction_error.png)
+![Error global de reconstrucción](../metodo_SVD/fig6_reconstruction_error.png)
 
 El script calcula el error de Frobenius:
 
@@ -185,10 +206,10 @@ Figura generada en el bloque 6.
 
 ---
 
-<a id="figura-6-error-por-ventana-usando-k95-de-energia"></a>
-### Figura 6 – Error por ventana usando k≈95% de energía
+<a id="figura-7-error-por-ventana-usando-k95-de-energia"></a>
+### Figura 7 – Error por ventana usando k≈95% de energía
 
-![Error por ventana](../metodo_SVD/fig6_window_errors_95.png)
+![Error por ventana](../metodo_SVD/fig7_window_errors_95.png)
 
 Este gráfico aplica una idea clave del análisis POD:
 usar pocos modos dominantes para reconstruir y medir el residuo.
@@ -213,8 +234,8 @@ Figura generada y \(k_{95}\) calculado en el bloque 7.
 
 ---
 
-<a id="figura-7-reconstruccion-de-una-ventana-representativa"></a>
-### Figura 7 – Reconstrucción de una ventana representativa
+<a id="figura-8-reconstruccion-de-una-ventana-representativa"></a>
+### Figura 8 – Reconstrucción de una ventana representativa
 
 ![Reconstrucción ventana central](../metodo_SVD/central_window_3426.png)
 
@@ -240,8 +261,8 @@ Bloque 9 del script.
 
 ---
 
-<a id="figura-8-reconstruccion-de-la-ventana-mas-anomala"></a>
-### Figura 8 – Reconstrucción de la ventana más anómala
+<a id="figura-9-reconstruccion-de-la-ventana-mas-anomala"></a>
+### Figura 9 – Reconstrucción de la ventana más anómala
 
 ![Reconstrucción ventana anómala](../metodo_SVD/anomalous_window_1523.png)
 
@@ -259,10 +280,10 @@ La selección del índice anómalo depende de `np.argmax(window_errors)`.
 
 ---
 
-<a id="figura-9-heatmap-de-la-matriz-de-snapshots-x"></a>
-### Figura 9 – Heatmap de la matriz de snapshots X
+<a id="figura-10-heatmap-de-la-matriz-de-snapshots-x"></a>
+### Figura 10 – Heatmap de la matriz de snapshots X
 
-![Heatmap de X](../metodo_SVD/fig9_X_heatmap.png)
+![Heatmap de X](../metodo_SVD/fig10_X_heatmap.png)
 
 El heatmap da una vista global de la matriz de snapshots.
 En analogía con la lectura del heatmap 
@@ -350,13 +371,13 @@ python svd_pod_analysis.py
 ```
 
 El script generará automáticamente:
-
-- `fig1_svd_spectrum.png`
-- `fig2_cumulative_energy.png`
-- `fig3_spatial_modes.png`
-- `fig4_temporal_coeffs.png`
-- `fig5_reconstruction_error.png`
-- `fig6_window_errors_95.png`
-- `fig9_X_heatmap.png`
+- `fig1_timeseries.png`
+- `fig2_svd_spectrum.png`
+- `fig3_cumulative_energy.png`
+- `fig4_spatial_modes.png`
+- `fig5_temporal_coeffs.png`
+- `fig6_reconstruction_error.png`
+- `fig7_window_errors_95.png`
+- `fig10_X_heatmap.png`
 - `central_window_<n>.png`
 - `anomalous_window_<n>.png`
