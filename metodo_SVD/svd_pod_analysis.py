@@ -20,6 +20,16 @@ daily = daily.sort_values("date")
 y = daily["accidents_count"].values
 len_series = len(y)
 
+plt.figure(figsize=(10, 4))
+plt.plot(daily["date"], y, linewidth=1)
+plt.xlabel("Fecha")
+plt.ylabel("Número de accidentes")
+plt.title("Serie temporal diaria de accidentes")
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig("fig1_original_daily_series.png")
+plt.close()
+
 # Parámetro de ventana deslizante
 window_size = 30
 n_windows = len_series - window_size + 1
@@ -50,7 +60,7 @@ plt.xlabel("Índice del modo")
 plt.ylabel("Valor singular σ")
 plt.title("Espectro de valores singulares (SVD)")
 plt.tight_layout()
-plt.savefig("fig1_svd_spectrum.png")
+plt.savefig("fig2_svd_spectrum.png")
 plt.close()
 
 # ============================================================
@@ -64,7 +74,7 @@ plt.ylabel("Energía acumulada")
 plt.title("Energía acumulada de los modos SVD")
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("fig2_cumulative_energy.png")
+plt.savefig("fig3_cumulative_energy.png")
 plt.close()
 
 # Imprimir tabla de las primeras energías
@@ -90,7 +100,7 @@ plt.ylabel("Amplitud del modo")
 plt.title("Primeros 3 modos espaciales (POD)")
 plt.legend()
 plt.tight_layout()
-plt.savefig("fig3_spatial_modes.png")
+plt.savefig("fig4_spatial_modes.png")
 plt.close()
 
 # ============================================================
@@ -106,7 +116,7 @@ plt.ylabel("Coeficiente temporal")
 plt.title("Primeros 3 coeficientes temporales")
 plt.legend()
 plt.tight_layout()
-plt.savefig("fig4_temporal_coeffs.png")
+plt.savefig("fig5_temporal_coeffs.png")
 plt.close()
 
 
@@ -129,7 +139,7 @@ plt.ylabel("Error de reconstrucción ||X - X_k||_F")
 plt.title("Error de reconstrucción en función de k")
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("fig5_reconstruction_error.png")
+plt.savefig("fig6_reconstruction_error.png")
 plt.close()
 
 # ============================================================
@@ -147,7 +157,7 @@ plt.xlabel("Índice de ventana")
 plt.ylabel("Error de reconstrucción (k ≈ 95% energía)")
 plt.title(f"Error por ventana usando k={k95} modos (~95% energía)")
 plt.tight_layout()
-plt.savefig("fig6_window_errors_95.png")
+plt.savefig("fig7_window_errors_95.png")
 plt.close()
 
 print(f"\\nNúmero de modos para ~95% energía: k95 = {k95}")
@@ -200,5 +210,5 @@ plt.xlabel("Ventanas (submuestreadas)")
 plt.ylabel("Días dentro de la ventana")
 plt.title("Heatmap de la matriz de snapshots X")
 plt.tight_layout()
-plt.savefig("fig9_X_heatmap.png")
+plt.savefig("fig10_X_heatmap.png")
 plt.close()

@@ -92,7 +92,7 @@ El cálculo se observa en el bloque 1 del script.
 <a id="figura-1-serie-temporal-diaria-de-accidentes"></a>
 ## Figura 1– Serie temporal diaria de accidentes
 
-![Serie temporal diaria de accidentes](../metodo_SVD/fig1_timeseries.png)
+![Serie temporal diaria de accidentes](../metodo_SVD/fig1_original_daily_series.png)
 
 La Figura 1 muestra la serie temporal diaria de accidentes durante todo el
 periodo disponible en la base de datos. En el eje horizontal se representa la
