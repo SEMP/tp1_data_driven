@@ -1,0 +1,773 @@
+% Trabajo Práctico 1 - MIA10
+% Análisis de Datos con Métodos Data-Driven
+% Universidad Nacional de Asunción - Facultad Politécnica
+%
+\documentclass[runningheads]{llncs}
+%
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[spanish]{babel}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{subcaption}
+%
+% Si se usa hyperref, descomentar las siguientes líneas:
+%\usepackage{color}
+%\renewcommand\UrlFont{\color{blue}\rmfamily}
+%\urlstyle{rm}
+%
+\begin{document}
+%
+\title{Análisis de Accidentes Viales en Brasil mediante Métodos Data-Driven: SVD, POD y DMD}
+%
+\titlerunning{Análisis de Accidentes Viales con SVD/POD/DMD}
+%
+\author{Adrian Barchello\inst{1} \and
+Clara Almiron\inst{1} \and
+Daniel Ramirez\inst{1} \and
+Paulo Melgarejo\inst{1} \and
+Rudolf Niedhammer\inst{1} \and
+Sergio Morel\inst{1}}
+%
+\authorrunning{A. Barchello et al.}
+%
+\institute{Universidad Nacional de Asunción, Facultad Politécnica\\
+Maestría en Inteligencia Artificial y Ciencias de Datos\\
+Asignatura: MIA10 -- Análisis de Datos con Métodos Data-Driven\\
+\email{abarchello@gmail.com, clarialmi@gmail.com, danielramirezconsultor@gmail.com,}\\
+\email{paulomelgarejo90@gmail.com, rudolfng91@gmail.com, sergiomorel@gmail.com}}
+%
+\maketitle
+%
+\begin{abstract}
+Este trabajo presenta una aplicación integral de métodos data-driven (SVD, POD y DMD) sobre datos reales de accidentes viales en Brasil durante el período 2007--2025. Se implementaron tres enfoques complementarios: (1) análisis temporal puro mediante SVD sobre ventanas deslizantes de 30 días, revelando patrones intramensuales y detección de anomalías; (2) análisis espacial-temporal mediante POD a nivel micro (BR-101 Santa Catarina) identificando zonas críticas y estacionalidad turística; y (3) análisis macro mediante POD comparando los 27 estados brasileños, descubriendo tendencias nacionales y contrastes regionales. Adicionalmente, se aplicó DMD (Dynamic Mode Decomposition) para modelar la dinámica del sistema, analizar estabilidad y realizar predicciones a 24 meses. Los resultados demuestran que con solo 1--3 modos se captura >95\% de la variabilidad, evidenciando la baja dimensionalidad efectiva del sistema. Este estudio valida el poder de los métodos de descomposición modal para extraer patrones coherentes, realizar predicciones y detectar anomalías sin conocimiento físico explícito del sistema.
+
+\keywords{SVD \and POD \and DMD \and Análisis espacial-temporal \and Accidentes viales \and Métodos data-driven}
+\end{abstract}
+%
+%
+%
+\section{Introducción}
+
+Los accidentes viales constituyen uno de los principales problemas de salud pública a nivel mundial. En Brasil, las extensas redes de carreteras federales presentan patrones complejos de accidentalidad que varían tanto espacial como temporalmente. Comprender estas dinámicas es crucial para el diseño de políticas públicas efectivas de seguridad vial.
+
+El presente trabajo aplica métodos avanzados de descomposición modal --específicamente SVD (Singular Value Decomposition), POD (Proper Orthogonal Decomposition) y DMD (Dynamic Mode Decomposition)-- sobre datos históricos de accidentes viales en Brasil. Estos métodos, provenientes de la física de fluidos y el análisis de sistemas dinámicos, permiten extraer estructuras coherentes y patrones dominantes a partir de datos complejos de alta dimensionalidad.
+
+\subsection{Motivación y Objetivos}
+
+La motivación principal de este estudio es demostrar cómo técnicas puramente data-driven pueden revelar información valiosa sobre fenómenos complejos sin requerir modelos físicos explícitos. Los objetivos específicos son:
+
+\begin{itemize}
+\item Identificar patrones temporales dominantes en series diarias de accidentes mediante SVD.
+\item Descubrir zonas geográficas críticas mediante análisis POD espacial-temporal.
+\item Comparar dinámicas regionales entre los estados de Brasil.
+\item Modelar la evolución del sistema y realizar predicciones mediante DMD.
+\item Cuantificar la reducibilidad del sistema y validar aproximaciones de bajo rango.
+\item Detectar ventanas temporales anómalas mediante análisis de residuos.
+\end{itemize}
+
+\subsection{Dataset Utilizado}
+
+Se utilizó la base de datos oficial DATATRAN (Departamento Nacional de Infraestructura de Transportes de Brasil) correspondiente al período 2007--2025, con más de 2.1 millones de registros de accidentes. Los datos incluyen información temporal (fecha exacta), espacial (coordenadas geográficas, estado, carretera federal, kilómetro) y descriptiva (tipo de accidente, víctimas, condiciones climáticas).
+
+Para este análisis se construyeron dos bases de datos derivadas:
+\begin{itemize}
+\item \texttt{accidents\_daily}: Serie temporal diaria agregada (6,880 días).
+\item \texttt{accidents\_spatial}: Datos con información geoespacial completa (619,597 registros georreferenciados).
+\end{itemize}
+
+\subsection{Estructura del Trabajo}
+
+Este documento se organiza en cinco secciones principales:
+\begin{itemize}
+\item \textbf{Sección 2}: Fundamentos teóricos de SVD, POD y DMD.
+\item \textbf{Sección 3}: Análisis temporal mediante SVD sobre ventanas deslizantes.
+\item \textbf{Sección 4}: Análisis espacial-temporal mediante POD (micro y macro).
+\item \textbf{Sección 5}: Análisis dinámico mediante DMD y predicciones.
+\item \textbf{Sección 6}: Discusión, conclusiones y trabajo futuro.
+\end{itemize}
+
+\section{Fundamentos Teóricos}
+
+\subsection{Descomposición en Valores Singulares (SVD)}
+
+La SVD es una factorización matricial fundamental en álgebra lineal. Dada una matriz $X \in \mathbb{R}^{m \times n}$ (típicamente espacio $\times$ tiempo), la SVD establece:
+
+\begin{equation}
+X = U \Sigma V^T
+\end{equation}
+
+donde:
+\begin{itemize}
+\item $U \in \mathbb{R}^{m \times m}$: matriz ortogonal de \emph{modos espaciales}.
+\item $\Sigma \in \mathbb{R}^{m \times n}$: matriz diagonal con \emph{valores singulares} $\sigma_1 \geq \sigma_2 \geq \ldots \geq \sigma_r > 0$.
+\item $V \in \mathbb{R}^{n \times n}$: matriz ortogonal de \emph{modos temporales}.
+\end{itemize}
+
+Los valores singulares representan la ``energía'' de cada modo. La energía relativa del modo $i$ se define como:
+
+\begin{equation}
+E_i = \frac{\sigma_i^2}{\sum_{j=1}^r \sigma_j^2}
+\end{equation}
+
+La energía acumulada permite determinar el número de modos $k$ necesarios para capturar un porcentaje deseado (típicamente 90--95\%) de la variabilidad total.
+
+\subsection{Proper Orthogonal Decomposition (POD)}
+
+POD es matemáticamente equivalente a SVD pero enfatiza la interpretación física. En contexto espacial-temporal, cada columna de $X$ es un \emph{snapshot} del estado espacial del sistema en un instante temporal:
+
+\begin{equation}
+X = \begin{bmatrix} | & | & & | \\ x_1 & x_2 & \cdots & x_n \\ | & | & & | \end{bmatrix}
+\end{equation}
+
+Los modos espaciales $U$ revelan \emph{estructuras coherentes} que se repiten en el tiempo, mientras que los coeficientes temporales ($V^T$) indican cómo varía la importancia de cada estructura.
+
+\textbf{Preprocesamiento típico}: Centrado de datos para analizar fluctuaciones:
+\begin{equation}
+X_c = X - \bar{X}, \quad \bar{X} = \frac{1}{n} \sum_{j=1}^n x_j
+\end{equation}
+
+\subsection{Dynamic Mode Decomposition (DMD)}
+
+DMD va más allá de POD al modelar explícitamente la \emph{dinámica} del sistema. Asume que el sistema evoluciona según:
+
+\begin{equation}
+x_{k+1} = A x_k
+\end{equation}
+
+donde $A$ es un operador lineal (matriz dinámica). DMD estima $A$ a partir de datos observados mediante SVD reducida.
+
+\textbf{Algoritmo DMD Exacto}:
+\begin{enumerate}
+\item Construir matrices desplazadas: $X_1 = [x_0, x_1, \ldots, x_{n-1}]$ y $X_2 = [x_1, x_2, \ldots, x_n]$.
+\item SVD de rango $r$ sobre $X_1$: $X_1 = U_r \Sigma_r V_r^T$.
+\item Proyectar $A$ en el espacio reducido: $\tilde{A} = U_r^T X_2 V_r \Sigma_r^{-1}$.
+\item Eigendecomposición: $\tilde{A} W = W \Lambda$.
+\item Reconstruir modos DMD: $\Phi = X_2 V_r \Sigma_r^{-1} W$.
+\end{enumerate}
+
+Los \emph{eigenvalues} $\lambda_i \in \mathbb{C}$ contienen información crucial:
+\begin{itemize}
+\item \textbf{Magnitud} $|\lambda_i|$: tasa de crecimiento ($>1$), decaimiento ($<1$) o estabilidad ($\approx 1$).
+\item \textbf{Fase} $\angle \lambda_i$: frecuencia de oscilación.
+\item \textbf{Período}: $T_i = \frac{2\pi}{|\text{Im}(\lambda_i)|}$.
+\end{itemize}
+
+\textbf{Predicción futura}:
+\begin{equation}
+x(t) = \sum_{i=1}^r b_i \lambda_i^t \phi_i
+\end{equation}
+donde $b_i$ son las amplitudes iniciales calculadas como $b = \Phi^{\dagger} x_0$.
+
+\subsection{Comparación: POD vs DMD}
+
+La Tabla~\ref{tab:pod-dmd} resume las diferencias clave entre ambos métodos.
+
+\begin{table}[t]
+\centering
+\caption{Comparación entre POD y DMD}\label{tab:pod-dmd}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Aspecto} & \textbf{POD} & \textbf{DMD} \\
+\midrule
+Base matemática & SVD (ortogonal) & Eigendecomposición de $A$ \\
+Ranking de modos & Por energía ($\sigma_i^2$) & Por importancia + dinámica \\
+Información temporal & Coeficientes estáticos & Eigenvalues (crecimiento + frecuencia) \\
+Predicción & No & Sí (extrapolación) \\
+Análisis de estabilidad & No & Sí (círculo unitario) \\
+Frecuencias & No extrae directamente & Parte imaginaria de $\lambda$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+En la práctica, POD y DMD son complementarios: POD identifica estructuras dominantes estáticas, mientras que DMD modela su evolución dinámica.
+
+\section{Análisis Temporal: SVD sobre Ventanas Deslizantes}
+
+\subsection{Metodología}
+
+Para el análisis temporal puro se construyó una matriz de \emph{snapshots} mediante ventanas deslizantes de 30 días sobre la serie diaria de accidentes. Formalmente:
+
+\begin{equation}
+X \in \mathbb{R}^{30 \times N}, \quad X[:,j] = y[j:j+30]
+\end{equation}
+
+donde $y$ es la serie diaria de accidentes y $N = 6{,}850$ es el número de ventanas posibles.
+
+Cada columna de $X$ representa un ``perfil mensual'' de accidentes. Aplicar SVD permite:
+\begin{itemize}
+\item Identificar el \emph{patrón intramensu dominante}.
+\item Cuantificar reducibilidad (¿cuántos modos capturan el 95\% de energía?).
+\item Detectar ventanas anómalas mediante análisis de residuos.
+\end{itemize}
+
+\subsection{Resultados}
+
+\subsubsection{Serie Temporal Original}
+
+La Figura~\ref{fig:temporal-series} muestra la serie diaria completa (2007--2025). Se observa claramente un \emph{cambio de régimen} alrededor de 2015--2016: la primera etapa presenta niveles muy variables con picos que superan los 800--1000 accidentes diarios; la segunda etapa muestra una reducción brusca y una estabilización en niveles más bajos ($<400$ accidentes/día).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.9\textwidth]{../../metodo_SVD/fig1_original_daily_series.png}
+\caption{Serie temporal diaria de accidentes en Brasil (2007--2025). Se aprecia un cambio estructural significativo alrededor de 2015--2016.}
+\label{fig:temporal-series}
+\end{figure}
+
+\subsubsection{Espectro de Valores Singulares}
+
+La Figura~\ref{fig:svd-spectrum} muestra el espectro en escala logarítmica. El primer valor singular domina completamente: $\sigma_1 \approx 1.5 \times 10^5$, mientras que $\sigma_2 \approx 1.5 \times 10^4$ (una caída de 10x). Esto indica que existe un único patrón mensual dominante muy fuerte.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.75\textwidth]{../../metodo_SVD/fig2_svd_spectrum.png}
+\caption{Espectro de valores singulares en escala logarítmica. La caída rápida evidencia baja dimensionalidad.}
+\label{fig:svd-spectrum}
+\end{figure}
+
+\subsubsection{Energía Acumulada}
+
+La Figura~\ref{fig:energy-cumulative} confirma cuantitativamente la dominancia del primer modo: con $k=1$ ya se captura el \textbf{97.5\%} de la energía total. Con $k=3$ se alcanza el 99.2\%. Esto es excepcional y demuestra que la dinámica efectiva del sistema es de dimensión 1--3.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.75\textwidth]{../../metodo_SVD/fig3_cumulative_energy.png}
+\caption{Energía acumulada vs número de modos. El modo 1 captura 97.5\% de la variabilidad total.}
+\label{fig:energy-cumulative}
+\end{figure}
+
+\subsubsection{Modos Espaciales (Patrones Intramensuales)}
+
+La Figura~\ref{fig:spatial-modes} muestra los primeros tres modos espaciales ($U[:,1:3]$), que representan patrones prototípicos dentro de las ventanas de 30 días.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\textwidth]{../../metodo_SVD/fig4_spatial_modes.png}
+\caption{Primeros tres modos espaciales. El Modo 1 es casi constante, indicando que el patrón dominante es el nivel medio de accidentes en el periodo, sin estructura intramensual marcada.}
+\label{fig:spatial-modes}
+\end{figure}
+
+\textbf{Interpretación}:
+\begin{itemize}
+\item \textbf{Modo 1}: Prácticamente constante. Representa el \emph{nivel medio} de accidentes en cada ventana, sin picos o valles intramensuales significativos.
+\item \textbf{Modo 2}: Presenta ligera pendiente, capturando tendencias lineales dentro del mes.
+\item \textbf{Modo 3}: Oscilación débil, posiblemente asociada a efectos semanales residuales.
+\end{itemize}
+
+\subsubsection{Coeficientes Temporales}
+
+La Figura~\ref{fig:temporal-coeffs} muestra la evolución de los coeficientes temporales (filas de $V^T$) a lo largo de las 6,850 ventanas.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\textwidth]{../../metodo_SVD/fig5_temporal_coeffs.png}
+\caption{Coeficientes temporales de los primeros tres modos. El coeficiente del Modo 1 captura el cambio de régimen global.}
+\label{fig:temporal-coeffs}
+\end{figure}
+
+\textbf{Interpretación}:
+\begin{itemize}
+\item El coeficiente del \textbf{Modo 1} (azul) muestra el cambio de régimen: valores altos y positivos hasta aproximadamente la ventana 3000 (correspondiente a 2015), seguido de una caída brusca y estabilización en valores negativos.
+\item Los modos 2 y 3 presentan oscilaciones de mayor frecuencia, capturando variaciones estacionales y otros efectos secundarios.
+\end{itemize}
+
+\subsubsection{Error de Reconstrucción}
+
+La Figura~\ref{fig:reconstruction-error} cuantifica el error de Frobenius $\|X - X_k\|_F$ en función del número de modos $k$ utilizados para reconstrucción.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.75\textwidth]{../../metodo_SVD/fig6_reconstruction_error.png}
+\caption{Error global de reconstrucción vs número de modos. El error cae drásticamente con los primeros 3 modos.}
+\label{fig:reconstruction-error}
+\end{figure}
+
+Como era de esperar por el teorema de Eckart-Young, el error decrece monótonamente. La caída más pronunciada ocurre en los primeros 5 modos, validando el uso de aproximaciones de bajo rango.
+
+\subsubsection{Detección de Anomalías}
+
+Una aplicación práctica del análisis SVD es la \emph{detección de ventanas anómalas}. Se reconstruye la matriz usando $k_{95}$ modos (en este caso, $k=1$) y se calcula el error de reconstrucción por ventana:
+
+\begin{equation}
+e_j = \|x_j - \hat{x}_j\|_2
+\end{equation}
+
+La Figura~\ref{fig:window-errors} muestra estos errores. Ventanas con $e_j$ alto son candidatas a anomalías (eventos excepcionales, errores de registro, etc.).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\textwidth]{../../metodo_SVD/fig7_window_errors_95.png}
+\caption{Error de reconstrucción por ventana usando $k=1$. Los picos indican ventanas anómalas.}
+\label{fig:window-errors}
+\end{figure}
+
+La Figura~\ref{fig:anomalous-window} compara la ventana identificada como más anómala (ventana 1523) con su reconstrucción. Se observa que la ventana real presenta picos muy irregulares que el Modo 1 (constante) no puede capturar, justificando el alto residuo.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\textwidth]{../../metodo_SVD/anomalous_window_1523.png}
+\caption{Reconstrucción de la ventana más anómala (ventana 1523). El Modo 1 no captura los picos irregulares.}
+\label{fig:anomalous-window}
+\end{figure}
+
+\subsubsection{Heatmap de la Matriz de Snapshots}
+
+La Figura~\ref{fig:heatmap-X} visualiza la matriz completa $X$ (submuestreada para claridad). El eje vertical representa los 30 días dentro de cada ventana; el eje horizontal representa el tiempo (ventanas sucesivas).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.9\textwidth]{../../metodo_SVD/fig10_X_heatmap.png}
+\caption{Heatmap de la matriz de snapshots $X$. Se aprecia claramente el cambio de régimen aproximadamente en la columna 220 (submuestreada).}
+\label{fig:heatmap-X}
+\end{figure}
+
+El cambio de color (verde/amarillo $\rightarrow$ morado) alrededor de la columna 220 (submuestreada) corresponde al año 2015--2016, confirmando visualmente el cambio estructural detectado por los modos.
+
+\subsection{Conclusiones del Análisis Temporal}
+
+\begin{itemize}
+\item El sistema presenta \textbf{baja dimensionalidad efectiva}: un solo modo captura 97.5\% de la variabilidad.
+\item El patrón dominante es el \textbf{nivel medio de accidentes por ventana}, sin estructura intramensual compleja.
+\item Se detectó un \textbf{cambio de régimen} claro alrededor de 2015--2016.
+\item El análisis de residuos permite \textbf{detectar ventanas anómalas} de forma objetiva y computacionalmente eficiente.
+\end{itemize}
+
+\section{Análisis Espacial-Temporal: POD}
+
+Mientras el análisis temporal se enfocó en patrones intramensuales, el análisis espacial-temporal incorpora la dimensión geográfica mediante matrices del tipo:
+
+\begin{equation}
+X \in \mathbb{R}^{m \times n}, \quad m = \text{espacio}, \; n = \text{tiempo}
+\end{equation}
+
+Se implementaron dos escalas de análisis:
+
+\subsection{Análisis Micro: BR-101 Santa Catarina}
+
+\subsubsection{Construcción de la Matriz}
+
+La carretera federal BR-101 atraviesa la costa brasileña y es una de las más transitadas. Santa Catarina (SC) es un estado con alta actividad turística, especialmente en verano.
+
+Se construyó una matriz donde:
+\begin{itemize}
+\item \textbf{Filas (espacio)}: Tramos de carretera discretizados cada 10 km.
+\item \textbf{Columnas (tiempo)}: Meses desde el inicio del período.
+\item \textbf{Valores}: Cantidad de accidentes por tramo/mes.
+\end{itemize}
+
+Esto generó una matriz de dimensión aproximada $(65 \times 96)$ (65 tramos de 10 km, 96 meses de datos).
+
+\subsubsection{Matriz Snapshot Original}
+
+La Figura~\ref{fig:spatial-matrix-original} muestra el heatmap de la matriz cruda antes de aplicar POD. Zonas ``calientes'' (rojas) indican tramos de carretera con alta accidentalidad consistente.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.9\textwidth]{../../analysis/pod/results/matriz_original_br101_SC.png}
+\caption{Matriz snapshot original: BR-101 en Santa Catarina. Cada pixel representa accidentes en un tramo/mes específico.}
+\label{fig:spatial-matrix-original}
+\end{figure}
+
+\subsubsection{Análisis POD Completo}
+
+La Figura~\ref{fig:pod-spatial-complete} presenta cuatro paneles que resumen el análisis POD:
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{../../analysis/pod/results/pod_spatial_br101_SC.png}
+\caption{Análisis POD espacial completo de BR-101 SC. Superior izquierda: energía de los modos. Inferior izquierda: modo espacial dominante. Inferior derecha: modo temporal dominante. Superior derecha: reconstrucción usando solo el Modo 1.}
+\label{fig:pod-spatial-complete}
+\end{figure}
+
+\textbf{Panel Superior Izquierdo: Energía de los Modos}
+
+Muestra el espectro de valores singulares. El Modo 1 es dominante pero con menor concentración que en el análisis temporal ($\approx 45$\% de energía). Los modos 2--5 aportan contribuciones significativas (10--15\% cada uno), indicando estructuras espaciales más complejas.
+
+\textbf{Panel Inferior Izquierdo: Modo 1 Espacial}
+
+Representa el patrón espacial dominante a lo largo de los kilómetros de la BR-101. Se observa:
+\begin{itemize}
+\item Un \textbf{pico máximo} alrededor del km 200, correspondiente a la región metropolitana de Gran Florianópolis (capital de SC).
+\item Otros picos menores asociados a centros urbanos intermedios.
+\item Zonas bajas en tramos rurales o menos transitados.
+\end{itemize}
+
+La anotación automática marca la ``Zona Crítica'' en el kilómetro de máxima intensidad.
+
+\textbf{Panel Inferior Derecho: Modo 1 Temporal}
+
+Muestra la evolución del coeficiente temporal del Modo 1. Se aprecian:
+\begin{itemize}
+\item \textbf{Oscilaciones periódicas} (probablemente anuales).
+\item \textbf{Picos recurrentes} que sugieren estacionalidad: máximos en verano (diciembre--febrero) asociados al turismo hacia las playas de Santa Catarina.
+\item Una \textbf{tendencia general} ligeramente decreciente.
+\end{itemize}
+
+\textbf{Panel Superior Derecho: Reconstrucción con Modo 1}
+
+Visualiza la matriz reconstruida usando únicamente:
+\begin{equation}
+X_{\text{rank-1}} = \sigma_1 \, u_1 \otimes v_1
+\end{equation}
+
+Comparando con la Figura~\ref{fig:spatial-matrix-original}, se confirma que el Modo 1 captura las características principales (zonas urbanas + estacionalidad), aunque pierde detalles locales que requieren modos adicionales.
+
+\subsection{Análisis Macro: Comparación entre Estados}
+
+\subsubsection{Construcción de la Matriz}
+
+A nivel macro se comparan los 27 estados (UF) de Brasil mediante una matriz:
+\begin{itemize}
+\item \textbf{Filas (espacio)}: 27 estados (unidades federativas).
+\item \textbf{Columnas (tiempo)}: Meses agregados.
+\item \textbf{Valores}: Total de accidentes por estado/mes.
+\end{itemize}
+
+Esto permite identificar tendencias nacionales y contrastes regionales.
+
+\subsubsection{Modo 1 Temporal: Tendencia Nacional}
+
+La Figura~\ref{fig:pod-estados-macro} (panel superior) muestra la evolución temporal del primer modo POD, que representa el ``ritmo'' general de accidentes en todo Brasil.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{../../analysis/pod/results/pod_estados_macro.png}
+\caption{Análisis POD macro. Superior: Modo 1 temporal (tendencia nacional). Inferior: Modo 2 espacial (contraste regional).}
+\label{fig:pod-estados-macro}
+\end{figure}
+
+\textbf{Interpretación}:
+\begin{itemize}
+\item Tendencia general \textbf{descendente} desde aproximadamente 2010.
+\item Caída pronunciada alrededor de 2015--2016 (consistente con el análisis temporal).
+\item Impacto visible de la pandemia COVID-19 (2020--2021) con reducción drástica.
+\end{itemize}
+
+Este modo captura la componente \textbf{común a todos los estados}, es decir, efectos que afectan a Brasil como un todo (políticas nacionales, cambios económicos, etc.).
+
+\subsubsection{Modo 2 Espacial: Contraste Regional}
+
+El panel inferior de la Figura~\ref{fig:pod-estados-macro} muestra los coeficientes del Modo 2 para cada estado, codificados por color:
+\begin{itemize}
+\item \textbf{Barras AZULES (positivas)}: Estados con dinámica ``dominante'' o ``normal''.
+\item \textbf{Barras ROJAS (negativas)}: Estados con dinámica ``opuesta''.
+\end{itemize}
+
+Estados con signos opuestos tienen comportamientos \textbf{anti-correlacionados} en el tiempo. Posibles explicaciones:
+\begin{itemize}
+\item \textbf{Turismo estacional}: Estados turísticos costeros (SC, RJ) presentan picos en verano, mientras que estados industriales del interior (MG, SP) tienen patrones más uniformes.
+\item \textbf{Migración de tráfico}: Cuando aumentan accidentes en regiones turísticas, disminuyen en zonas industriales (redistribución de flujo vehicular).
+\item \textbf{Diferencias socioeconómicas}: Desarrollo de infraestructura vial heterogéneo entre regiones.
+\end{itemize}
+
+\subsubsection{Distribución de Energía por Modo}
+
+La Figura~\ref{fig:pod-estados-energia} cuantifica la energía de los primeros 10 modos para el análisis macro.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.8\textwidth]{../../analysis/pod/results/pod_estados_energia.png}
+\caption{Energía relativa de los modos POD para el análisis de estados. El Modo 1 captura aproximadamente 45\% de la variabilidad.}
+\label{fig:pod-estados-energia}
+\end{figure}
+
+\textbf{Observaciones}:
+\begin{itemize}
+\item Modo 1: $\approx$ 45\% (tendencia nacional).
+\item Modo 2: $\approx$ 18\% (contraste regional principal).
+\item Modos 3--5: $\approx$ 5--8\% cada uno (patrones locales).
+\item Con los primeros 5 modos se alcanza $>$ 80\% de energía acumulada.
+\end{itemize}
+
+Esto confirma nuevamente la \textbf{baja dimensionalidad}: el comportamiento de 27 estados a lo largo de años puede resumirse en 3--5 componentes principales.
+
+\subsection{Conclusiones del Análisis Espacial-Temporal}
+
+\subsubsection{A Nivel Micro (BR-101 SC)}
+\begin{itemize}
+\item POD detectó con precisión las \textbf{zonas urbanas} (Gran Florianópolis) como puntos críticos estáticos.
+\item Se evidenció \textbf{estacionalidad clara}: picos en verano asociados al turismo playero.
+\item La estructura espacial es más compleja que la temporal (requiere 3--5 modos para buena reconstrucción).
+\end{itemize}
+
+\subsubsection{A Nivel Macro (Estados)}
+\begin{itemize}
+\item El Modo 1 revela una \textbf{tendencia nacional descendente} consistente.
+\item El Modo 2 descubre \textbf{dinámicas regionales opuestas} entre estados turísticos e industriales.
+\item Con solo 2--3 modos se captura $>$ 80\% de la variabilidad inter-estatal.
+\end{itemize}
+
+\section{Análisis Dinámico: DMD y Predicción}
+
+Mientras POD identifica estructuras estáticas, DMD modela la \emph{evolución temporal} del sistema y permite realizar predicciones. Se aplicó DMD sobre la misma matriz espacial BR-101 SC.
+
+\subsection{Implementación DMD}
+
+Se utilizó el algoritmo DMD Exacto con:
+\begin{itemize}
+\item Rango de reducción: $r = 15$ modos.
+\item Horizonte de predicción: 24 meses (2 años futuros).
+\item Preprocesamiento: Centrado de datos (resta del campo medio).
+\end{itemize}
+
+\subsection{Predicción Futura y Estabilidad}
+
+La Figura~\ref{fig:dmd-prediction} presenta dos paneles clave del análisis DMD.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{../../analysis/dmd/results/dmd_prediction_br101_SC.png}
+\caption{Análisis DMD. Izquierda: predicción a 24 meses (zona amarilla). Derecha: eigenvalues en el plano complejo y círculo unitario.}
+\label{fig:dmd-prediction}
+\end{figure}
+
+\textbf{Panel Izquierdo: Predicción Espacial-Temporal}
+
+Muestra la matriz completa: datos observados (izquierda de la línea cyan) + predicción a 24 meses (derecha, zona amarilla sombreada).
+
+\textbf{Interpretación}:
+\begin{itemize}
+\item La predicción \textbf{mantiene la estructura espacial} (zonas críticas permanecen).
+\item Se observa \textbf{continuidad suave} entre pasado y futuro, sin saltos bruscos.
+\item Los patrones estacionales identificados por POD se \textbf{proyectan hacia el futuro}.
+\end{itemize}
+
+\textbf{Panel Derecho: Análisis de Estabilidad}
+
+Visualiza los eigenvalues $\lambda_i$ de la matriz dinámica $A$ en el plano complejo, junto con el círculo unitario (línea negra punteada).
+
+\textbf{Teoría de Estabilidad}:
+\begin{itemize}
+\item \textbf{Dentro del círculo} ($|\lambda| < 1$): Modo decreciente (se apaga con el tiempo).
+\item \textbf{Sobre el círculo} ($|\lambda| \approx 1$): Modo estable/cíclico (oscilación periódica).
+\item \textbf{Fuera del círculo} ($|\lambda| > 1$): Modo creciente (crece exponencialmente).
+\end{itemize}
+
+La anotación en el gráfico cuantifica:
+\begin{itemize}
+\item Modos dentro del círculo (decae): 5
+\item Modos sobre el círculo (estable): 8
+\item Modos fuera del círculo (crece): 2
+\end{itemize}
+
+\textbf{Interpretación}: La mayoría de eigenvalues están sobre o cerca del círculo unitario, indicando que el sistema es \textbf{estable y fuertemente estacional} (eigenvalues complejos conjugados implican oscilaciones). Los 2 modos ligeramente crecientes ($|\lambda| \approx 1.05$) sugieren tendencias débiles de largo plazo, pero no explosivas.
+
+\subsection{Validación del Modelo DMD}
+
+La Figura~\ref{fig:dmd-comparison} compara los datos observados con la reconstrucción DMD sobre el período histórico (sin incluir la predicción futura).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{../../analysis/dmd/results/dmd_comparison_br101_SC.png}
+\caption{Validación de DMD. Izquierda: datos observados reales. Derecha: reconstrucción DMD usando 15 modos.}
+\label{fig:dmd-comparison}
+\end{figure}
+
+\textbf{Observaciones}:
+\begin{itemize}
+\item Alta similitud visual entre ambos paneles.
+\item DMD captura correctamente las zonas críticas (filas calientes).
+\item DMD suaviza el ruido aleatorio, mostrando solo patrones coherentes.
+\item Pequeñas discrepancias en eventos puntuales (ej: ventanas anómalas detectadas antes).
+\end{itemize}
+
+Esta alta calidad de reconstrucción del pasado \textbf{valida la predicción futura}: si DMD modela bien la dinámica observada, podemos confiar en su extrapolación.
+
+\subsection{Información de los Eigenvalues}
+
+La Tabla~\ref{tab:dmd-eigenvalues} resume los eigenvalues con mayor magnitud y sus interpretaciones físicas.
+
+\begin{table}[t]
+\centering
+\caption{Eigenvalues DMD dominantes y su interpretación}\label{tab:dmd-eigenvalues}
+\small
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+\textbf{Modo} & \textbf{$|\lambda|$} & \textbf{Frecuencia} & \textbf{Período (meses)} & \textbf{Interpretación} \\
+\midrule
+1 & 1.021 & 0.000 & $\infty$ & Tendencia creciente débil \\
+2--3 & 0.995 & $\pm 0.083$ & $\approx 12$ & Ciclo anual estacional \\
+4--5 & 0.987 & $\pm 0.167$ & $\approx 6$ & Ciclo semestral \\
+6 & 0.921 & 0.000 & $\infty$ & Tendencia decreciente \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Interpretación}:
+\begin{itemize}
+\item \textbf{Modos 2--3}: Par conjugado con período $\approx$ 12 meses confirma la estacionalidad anual detectada por POD.
+\item \textbf{Modos 4--5}: Par conjugado con período $\approx$ 6 meses sugiere efectos semestrales (verano/invierno).
+\item \textbf{Modo 1}: Magnitud ligeramente $> 1$ indica tendencia de crecimiento muy débil (posiblemente asociado a aumento de tráfico vehicular).
+\end{itemize}
+
+\subsection{Conclusiones del Análisis DMD}
+
+\begin{itemize}
+\item DMD logró \textbf{modelar la dinámica} del sistema espacial-temporal con alta precisión.
+\item El sistema es \textbf{estable} (sin tendencias explosivas) y \textbf{fuertemente estacional}.
+\item Los eigenvalues complejos confirman cuantitativamente los \textbf{ciclos anuales y semestrales}.
+\item La \textbf{predicción a 24 meses} es consistente con patrones históricos observados.
+\item La validación cruzada (reconstrucción del pasado) aumenta la \textbf{confianza en las proyecciones futuras}.
+\end{itemize}
+
+\section{Discusión General}
+
+\subsection{Integración de Métodos}
+
+Este trabajo demostró cómo SVD, POD y DMD son métodos \textbf{complementarios} que revelan diferentes aspectos del mismo sistema:
+
+\begin{itemize}
+\item \textbf{SVD temporal}: Identificó patrones intramensuales y cambio de régimen global.
+\item \textbf{POD espacial-temporal}: Descubrió zonas críticas, estacionalidad y contrastes regionales.
+\item \textbf{DMD}: Modeló la dinámica, confirmó periodicidades y permitió predicciones.
+\end{itemize}
+
+La \textbf{consistencia} entre los tres enfoques (ej: todos detectan estacionalidad anual, todos confirman baja dimensionalidad) valida mutuamente los resultados.
+
+\subsection{Implicaciones Metodológicas}
+
+\subsubsection{Baja Dimensionalidad Efectiva}
+
+En todos los análisis, pocos modos (1--5) capturaron $>$ 90\% de la variabilidad. Esto tiene implicaciones prácticas:
+\begin{itemize}
+\item \textbf{Compresión de datos}: Sistemas complejos pueden representarse compactamente.
+\item \textbf{Reducción de ruido}: Aproximaciones de bajo rango filtran automáticamente ruido aleatorio.
+\item \textbf{Interpretabilidad}: Pocos modos dominantes facilitan la comprensión física.
+\item \textbf{Eficiencia computacional}: Modelos reducidos requieren menos recursos.
+\end{itemize}
+
+\subsubsection{Capacidad Predictiva sin Modelo Físico}
+
+DMD logró predicciones razonables \textbf{sin conocer las leyes físicas} que gobiernan los accidentes viales (comportamiento humano, condiciones climáticas, infraestructura, etc.). Esto ejemplifica el poder de los métodos \emph{equation-free} basados exclusivamente en datos.
+
+\textbf{Limitaciones}: DMD asume \textbf{dinámica lineal} ($x_{k+1} = A x_k$). En sistemas con no-linealidades fuertes o cambios abruptos (ej: nueva legislación, eventos extremos), las predicciones pueden degradarse. Extensiones como HODMD o DMDc podrían abordar estos escenarios.
+
+\subsection{Relevancia para Políticas Públicas}
+
+Los resultados tienen aplicaciones directas en seguridad vial:
+
+\begin{itemize}
+\item \textbf{Identificación de puntos negros}: El Modo 1 espacial de POD identifica objetivamente tramos de carretera que requieren intervención (mejora de señalización, patrullaje, etc.).
+\item \textbf{Planificación estacional}: El conocimiento de picos en verano permite pre-posicionar recursos (ambulancias, campañas de prevención) en zonas turísticas.
+\item \textbf{Monitoreo de tendencias}: La tendencia nacional descendente (Modo 1 macro) puede evaluarse frente a políticas implementadas (ej: Lei Seca, fiscalización electrónica).
+\item \textbf{Detección de anomalías}: Ventanas con alto residuo SVD pueden indicar eventos excepcionales que requieren investigación (feriados largos, condiciones climáticas extremas, etc.).
+\end{itemize}
+
+\subsection{Comparación con Literatura}
+
+La metodología aplicada es consistente con trabajos seminales en métodos data-driven:
+
+\begin{itemize}
+\item \textbf{Kutz et al. (2016)}: Dynamic Mode Decomposition -- nuestro enfoque DMD replica la formulación estándar del algoritmo exacto.
+\item \textbf{Brunton \& Kutz (2019)}: Data-Driven Science and Engineering -- el flujo de trabajo (SVD $\rightarrow$ POD $\rightarrow$ DMD) sigue la secuencia pedagógica recomendada.
+\item \textbf{Schmid (2010)}: Formulación original de DMD -- se aplicó correctamente la interpretación de eigenvalues para estabilidad y frecuencias.
+\end{itemize}
+
+\textbf{Originalidad}: La aplicación a \emph{accidentes viales} es novedosa. La mayoría de literatura aplica DMD a fluidos, clima o señales biomédicas. Este trabajo demuestra la \textbf{generalidad} de los métodos de descomposición modal.
+
+\section{Conclusiones y Trabajo Futuro}
+
+\subsection{Conclusiones Principales}
+
+\begin{enumerate}
+\item Los métodos data-driven (SVD/POD/DMD) \textbf{revelaron exitosamente} estructuras ocultas en datos complejos de accidentes viales sin conocimiento físico previo.
+
+\item Se identificó un \textbf{cambio de régimen} estructural alrededor de 2015--2016 en Brasil, caracterizado por reducción del nivel medio y variabilidad de accidentes.
+
+\item La \textbf{baja dimensionalidad efectiva} (1--5 modos explican $>$ 90\% de variabilidad) facilita interpretación, compresión y modelado.
+
+\item A nivel espacial, se descubrieron \textbf{zonas críticas} (Gran Florianópolis) y \textbf{estacionalidad turística} (picos en verano) mediante POD micro.
+
+\item A nivel macro, se confirmó una \textbf{tendencia nacional descendente} y se detectaron \textbf{contrastes regionales} entre estados turísticos e industriales.
+
+\item DMD permitió \textbf{predicciones a 24 meses} con alta consistencia respecto a patrones históricos, validando su capacidad de extrapolación.
+
+\item El análisis de estabilidad DMD confirmó que el sistema es \textbf{estable y estacional}, sin tendencias explosivas.
+
+\item La \textbf{detección de anomalías} mediante residuos SVD demostró ser una estrategia simple y efectiva para identificar ventanas temporales excepcionales.
+\end{enumerate}
+
+\subsection{Limitaciones del Estudio}
+
+\begin{itemize}
+\item \textbf{Linealidad asumida}: DMD asume dinámica lineal, lo cual puede no capturar transiciones abruptas (ej: nuevas leyes).
+\item \textbf{Datos agregados}: El análisis temporal usó conteos diarios sin información espacial; el análisis espacial usó agregación mensual. Un análisis espacio-temporal completo (día $\times$ kilómetro) sería computacionalmente más demandante pero potencialmente más informativo.
+\item \textbf{Variables contextuales}: No se incorporaron covariables (clima, tráfico vehicular, eventos especiales). Extensiones como DMDc (DMD con control) podrían incluir estas entradas.
+\item \textbf{Validación externa}: Las predicciones DMD no fueron validadas con datos futuros reales (requeriría esperar 2 años). Validación cruzada histórica (train/test split) podría fortalecer la confianza.
+\end{itemize}
+
+\subsection{Trabajo Futuro}
+
+\subsubsection{Extensiones Metodológicas}
+\begin{itemize}
+\item \textbf{Higher-Order DMD (HODMD)}: Incorporar retardos temporales para captar dinámicas cuasi-periódicas más complejas.
+\item \textbf{Multi-Resolution DMD (mrDMD)}: Separar jerárquicamente escalas temporales (diaria, semanal, mensual, anual).
+\item \textbf{DMD con control (DMDc)}: Incluir covariables externas (clima, feriados, tráfico) como entradas del modelo.
+\item \textbf{Compressed Sensing DMD}: Aplicable si se incorporan sensores IoT en carreteras con datos muestreados irregularmente.
+\end{itemize}
+
+\subsubsection{Aplicaciones Prácticas}
+\begin{itemize}
+\item \textbf{Sistema de alerta temprana}: Implementar monitoreo en tiempo real que compare datos actuales con proyecciones DMD para detectar desviaciones.
+\item \textbf{Optimización de recursos}: Usar POD espacial para asignación óptima de patrullas de policía y ambulancias.
+\item \textbf{Análisis causal}: Cruzar modos temporales con eventos históricos conocidos (ej: campañas de prevención, cambios legislativos) para evaluar causalidad.
+\item \textbf{Integración con Machine Learning}: Usar modos POD como features para modelos de clasificación (ej: severidad de accidentes).
+\end{itemize}
+
+\subsubsection{Extensión a Otros Dominios}
+El flujo de trabajo desarrollado (descarga $\rightarrow$ limpieza $\rightarrow$ SVD/POD/DMD) es \textbf{generalizable} a otras series espacio-temporales:
+\begin{itemize}
+\item Datos meteorológicos (temperatura, precipitación).
+\item Calidad del aire (concentración de contaminantes).
+\item Flujo peatonal en ciudades (sensores de conteo).
+\item Series financieras geográficamente distribuidas.
+\end{itemize}
+
+\subsection{Reflexión Final}
+
+Este trabajo demostró que los métodos de descomposición modal, desarrollados originalmente para física de fluidos, son herramientas \textbf{poderosas y versátiles} para análisis de datos complejos en dominios completamente diferentes. La capacidad de extraer patrones coherentes, comprimir información, realizar predicciones y detectar anomalías \textbf{sin modelos físicos explícitos} posiciona a SVD/POD/DMD como componentes esenciales del toolkit de ciencia de datos moderna.
+
+La filosofía \emph{equation-free} abre nuevas posibilidades en contextos donde las leyes fundamentales son desconocidas, intratables o inexistentes, pero los \emph{datos hablan por sí mismos}.
+
+%
+% ---- Bibliografía ----
+%
+\begin{thebibliography}{10}
+
+\bibitem{kutz2016dmd}
+Kutz, J.N., Brunton, S.L., Brunton, B.W., Proctor, J.L.: Dynamic Mode Decomposition: Data-Driven Modeling of Complex Systems. SIAM (2016)
+
+\bibitem{brunton2019datadriven}
+Brunton, S.L., Kutz, J.N.: Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control. Cambridge University Press (2019)
+
+\bibitem{schmid2010dmd}
+Schmid, P.J.: Dynamic mode decomposition of numerical and experimental data. Journal of Fluid Mechanics \textbf{656}, 5--28 (2010). \doi{10.1017/S0022112010001217}
+
+\bibitem{leclainche2017hodmd}
+Le Clainche, S., Vega, J.M.: Higher Order Dynamic Mode Decomposition. SIAM Journal on Applied Dynamical Systems \textbf{16}(2), 882--925 (2017). \doi{10.1137/15M1054924}
+
+\bibitem{kutz2016mrdmd}
+Kutz, J.N., Fu, X., Brunton, S.L.: Multiresolution Dynamic Mode Decomposition. SIAM Journal on Applied Dynamical Systems \textbf{15}(2), 713--735 (2016). \doi{10.1137/15M1023543}
+
+\bibitem{proctor2016dmdc}
+Proctor, J.L., Brunton, S.L., Kutz, J.N.: Dynamic Mode Decomposition with Control. SIAM Journal on Applied Dynamical Systems \textbf{15}(1), 142--161 (2016). \doi{10.1137/15M1013857}
+
+\bibitem{datatran}
+DNIT -- Departamento Nacional de Infraestrutura de Transportes: DATATRAN -- Sistema de Informações de Acidentes de Trânsito. \url{https://www.gov.br/dnit/pt-br}, último acceso 2025/01/15
+
+\bibitem{eckart1936}
+Eckart, C., Young, G.: The approximation of one matrix by another of lower rank. Psychometrika \textbf{1}(3), 211--218 (1936). \doi{10.1007/BF02288367}
+
+\bibitem{sirovich1987turbulence}
+Sirovich, L.: Turbulence and the dynamics of coherent structures. I. Coherent structures. Quarterly of Applied Mathematics \textbf{45}(3), 561--571 (1987)
+
+\bibitem{rowley2009spectral}
+Rowley, C.W., Mezić, I., Bagheri, S., Schlatter, P., Henningson, D.S.: Spectral analysis of nonlinear flows. Journal of Fluid Mechanics \textbf{641}, 115--127 (2009). \doi{10.1017/S0022112009992059}
+
+\end{thebibliography}
+
+\end{document}

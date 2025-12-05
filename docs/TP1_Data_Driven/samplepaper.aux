@@ -1,0 +1,112 @@
+\relax 
+\providecommand\babel@aux[2]{}
+\@nameuse{bbl@beforestart}
+\catcode `"\active 
+\catcode `<\active 
+\catcode `>\active 
+\@nameuse{es@quoting}
+\babel@aux{spanish}{}
+\@writefile{toc}{\contentsline {title}{Análisis de Accidentes Viales en Brasil mediante Métodos Data-Driven: SVD, POD y DMD}{1}{}\protected@file@percent }
+\@writefile{toc}{\authcount {6}}
+\@writefile{toc}{\contentsline {author}{Adrian Barchello \and Clara Almiron \and Daniel Ramirez \and Paulo Melgarejo \and Rudolf Niedhammer \and Sergio Morel}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introducción}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Motivación y Objetivos}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Dataset Utilizado}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Estructura del Trabajo}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Fundamentos Teóricos}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Descomposición en Valores Singulares (SVD)}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Proper Orthogonal Decomposition (POD)}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Dynamic Mode Decomposition (DMD)}{3}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Comparación entre POD y DMD}}{4}{}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{tab:pod-dmd}{{1}{4}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Comparación: POD vs DMD}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Análisis Temporal: SVD sobre Ventanas Deslizantes}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Metodología}{4}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Serie temporal diaria de accidentes en Brasil (2007--2025). Se aprecia un cambio estructural significativo alrededor de 2015--2016.}}{5}{}\protected@file@percent }
+\newlabel{fig:temporal-series}{{1}{5}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Resultados}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Serie Temporal Original}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Espectro de Valores Singulares}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Energía Acumulada}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Modos Espaciales (Patrones Intramensuales)}{5}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Espectro de valores singulares en escala logarítmica. La caída rápida evidencia baja dimensionalidad.}}{6}{}\protected@file@percent }
+\newlabel{fig:svd-spectrum}{{2}{6}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Coeficientes Temporales}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Error de Reconstrucción}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Detección de Anomalías}{6}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Energía acumulada vs número de modos. El modo 1 captura 97.5\% de la variabilidad total.}}{7}{}\protected@file@percent }
+\newlabel{fig:energy-cumulative}{{3}{7}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Heatmap de la Matriz de Snapshots}{7}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Conclusiones del Análisis Temporal}{7}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Primeros tres modos espaciales. El Modo 1 es casi constante, indicando que el patrón dominante es el nivel medio de accidentes en el periodo, sin estructura intramensual marcada.}}{8}{}\protected@file@percent }
+\newlabel{fig:spatial-modes}{{4}{8}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Análisis Espacial-Temporal: POD}{8}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Análisis Micro: BR-101 Santa Catarina}{8}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Construcción de la Matriz}{8}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Coeficientes temporales de los primeros tres modos. El coeficiente del Modo 1 captura el cambio de régimen global.}}{9}{}\protected@file@percent }
+\newlabel{fig:temporal-coeffs}{{5}{9}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Matriz Snapshot Original}{9}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Análisis POD Completo}{9}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Error global de reconstrucción vs número de modos. El error cae drásticamente con los primeros 3 modos.}}{10}{}\protected@file@percent }
+\newlabel{fig:reconstruction-error}{{6}{10}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Análisis Macro: Comparación entre Estados}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Construcción de la Matriz}{10}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Error de reconstrucción por ventana usando $k=1$. Los picos indican ventanas anómalas.}}{11}{}\protected@file@percent }
+\newlabel{fig:window-errors}{{7}{11}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Modo 1 Temporal: Tendencia Nacional}{11}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Modo 2 Espacial: Contraste Regional}{11}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Reconstrucción de la ventana más anómala (ventana 1523). El Modo 1 no captura los picos irregulares.}}{12}{}\protected@file@percent }
+\newlabel{fig:anomalous-window}{{8}{12}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Distribución de Energía por Modo}{12}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Conclusiones del Análisis Espacial-Temporal}{12}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{A Nivel Micro (BR-101 SC)}{12}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Heatmap de la matriz de snapshots $X$. Se aprecia claramente el cambio de régimen aproximadamente en la columna 220 (submuestreada).}}{13}{}\protected@file@percent }
+\newlabel{fig:heatmap-X}{{9}{13}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{A Nivel Macro (Estados)}{13}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Análisis Dinámico: DMD y Predicción}{13}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Matriz snapshot original: BR-101 en Santa Catarina. Cada pixel representa accidentes en un tramo/mes específico.}}{14}{}\protected@file@percent }
+\newlabel{fig:spatial-matrix-original}{{10}{14}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Implementación DMD}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Predicción Futura y Estabilidad}{14}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Análisis POD espacial completo de BR-101 SC. Superior izquierda: energía de los modos. Inferior izquierda: modo espacial dominante. Inferior derecha: modo temporal dominante. Superior derecha: reconstrucción usando solo el Modo 1.}}{15}{}\protected@file@percent }
+\newlabel{fig:pod-spatial-complete}{{11}{15}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Validación del Modelo DMD}{15}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Análisis POD macro. Superior: Modo 1 temporal (tendencia nacional). Inferior: Modo 2 espacial (contraste regional).}}{16}{}\protected@file@percent }
+\newlabel{fig:pod-estados-macro}{{12}{16}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Información de los Eigenvalues}{16}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Energía relativa de los modos POD para el análisis de estados. El Modo 1 captura aproximadamente 45\% de la variabilidad.}}{17}{}\protected@file@percent }
+\newlabel{fig:pod-estados-energia}{{13}{17}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Análisis DMD. Izquierda: predicción a 24 meses (zona amarilla). Derecha: eigenvalues en el plano complejo y círculo unitario.}}{17}{}\protected@file@percent }
+\newlabel{fig:dmd-prediction}{{14}{17}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Conclusiones del Análisis DMD}{17}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Validación de DMD. Izquierda: datos observados reales. Derecha: reconstrucción DMD usando 15 modos.}}{18}{}\protected@file@percent }
+\newlabel{fig:dmd-comparison}{{15}{18}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Eigenvalues DMD dominantes y su interpretación}}{18}{}\protected@file@percent }
+\newlabel{tab:dmd-eigenvalues}{{2}{18}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Discusión General}{18}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Integración de Métodos}{18}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Implicaciones Metodológicas}{19}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Baja Dimensionalidad Efectiva}{19}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Capacidad Predictiva sin Modelo Físico}{19}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Relevancia para Políticas Públicas}{19}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Comparación con Literatura}{19}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusiones y Trabajo Futuro}{20}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Conclusiones Principales}{20}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Limitaciones del Estudio}{20}{}\protected@file@percent }
+\bibcite{kutz2016dmd}{1}
+\bibcite{brunton2019datadriven}{2}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Trabajo Futuro}{21}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Extensiones Metodológicas}{21}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Aplicaciones Prácticas}{21}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Extensión a Otros Dominios}{21}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}Reflexión Final}{21}{}\protected@file@percent }
+\bibcite{schmid2010dmd}{3}
+\bibcite{leclainche2017hodmd}{4}
+\bibcite{kutz2016mrdmd}{5}
+\bibcite{proctor2016dmdc}{6}
+\bibcite{datatran}{7}
+\bibcite{eckart1936}{8}
+\bibcite{sirovich1987turbulence}{9}
+\bibcite{rowley2009spectral}{10}
+\gdef \@abspage@last{22}
